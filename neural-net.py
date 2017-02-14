@@ -28,10 +28,16 @@ def classify(inputVector, imm_neural_net):
         return current_output
     else:
         return classify(current_output, neural_net)
+def accuracy(output, target):
+    truePositive = 0
+    falsePositive = 0
+    for i in range(len(output)):
+        if output[i] == target[i]:
+            truePositive = truePositive + 1
+        else:
+            falsePositive = falsePositive + 1
+    return float(truePositive) / len(output)
 
-
-input_vector = [2, 3, 4]
-map(lambda x: calc_threshold(input_vector, x), create_layer(len(input_vector), 3))
 
 df = pd.read_csv("iris.data", header = None, names = ["sepal_length",
                                                             "sepal_width",
@@ -39,14 +45,12 @@ df = pd.read_csv("iris.data", header = None, names = ["sepal_length",
                                                             "petal_width", "class"])
 df_input = df.drop("class", axis=1)
 df_norm = (df_input - df_input.mean()) / (df_input.max() - df_input.min())
-df_norm
+classifier = create_classifier(4, 4, 3)
+output = map(np.argmax, [classify(row, classifier) for index, row in df_norm.iterrows()])
+classes = list(set(df["class"]))
+print accuracy(output, [classes.index(x) for x in df["class"]])
 
 df = pd.read_csv("diabetes.data", header = None)
 df_input = df.drop(list(df)[-1], axis=1)
 df_norm = (df_input - df_input.mean()) / (df_input.max() - df_input.min())
 df_norm
-
-calc_activation(.27)
-calc_error_output(.38, 0)
-classifier = create_classifier(4, 4, 3)
-print set(map(np.argmax, [classify(row, classifier) for index, row in df.iterrows()]))
